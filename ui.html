@@ -1,0 +1,141 @@
+<section>
+
+<h2 id="heading">Node Counter</h2>
+<!-- <p>Count: <input id="count" value="5"></p> -->
+<button id="create" >Count Nodes</button>
+<!-- <button id="refresh">Refresh</button> -->
+<div id="main">
+  <div id="groups-toggle" value="side" style="display: none">
+    Groups &#9654;
+    <!-- &#9660; -->
+  </div>
+  <div id="display" style="display: none"></div>
+</div>
+</section>
+
+<script>
+document.getElementById("main").style.cursor = "pointer";
+
+
+
+let side_arrow = "&#9654;";
+let down_arrow = "&#9660;";
+document.getElementById('create').onclick = () => {
+  document.getElementById("display").innerHTML = "";
+  // const textbox = document.getElementById('coun);
+  // const count = parseInt(textbox.value, 10);
+  parent.postMessage({ pluginMessage: { type: 'create-rectangles'} }, '*')
+}
+
+
+// document.getElementById('refresh').onclick = () => {
+
+//   document.getElementById("create").disabled = false;
+
+// }
+
+// document.getElementById('cancel').onclick = () => {
+//   parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*')
+// }
+
+let top_val = "side";
+document.getElementById("groups-toggle").onclick = () => {
+  if(top_val === "side"){
+    document.getElementById("groups-toggle").innerHTML = "Groups " + down_arrow; 
+    top_val = "down"
+    document.getElementById("display").style.display = "block";
+  }
+  else{
+    document.getElementById("groups-toggle").innerHTML = "Groups " + side_arrow; 
+    top_val = "side"
+    document.getElementById("display").style.display = "none";
+  }
+}
+
+onmessage = (event) => {
+  document.getElementById("heading").innerHTML = "Nodes";
+  document.getElementById("create").style.display = "none";
+  document.getElementById("groups-toggle").style.display = "block";
+  document.getElementById("display").style.marginLeft = "10px"
+
+  let groups = event.data.pluginMessage;
+  let dropped_obj = {};
+
+  //add button
+  for(let i = 0 ; i < groups.length; i++){
+    // const div = document.createElement("div");
+    // div.innerHTML = alphabet;
+    // div.style = "border: 1px solid lightgrey; border-radius: 5px; padding: 5px 20px; margin: 8px 0; text-align: center;"
+    // div.style.fontFamily = `${unique_heading_fonts[i]}`;
+    // div.style.fontSize = "16px"
+    // document.getElementById("h-div" + `${i}`).appendChild(div);\
+
+    let group = groups[i];
+    let div = document.createElement("div");
+    div.className = "group";
+    // document.getElementById("h-div" + `${i}`).appendChild(div);
+    if(group.count > 1){ 
+      div.id = "poly" + i.toString();
+      dropped_obj[`${i}`] = false;
+      // div.innerHTML = group.name + " (" + group.count.toString() + ")" + "&#9654;";
+      document.getElementById("display").appendChild(div)
+      // document.getElementById("poly" + `${i}`).addEventListener("click", function() {
+      //   box_toggle(this.id);
+      // });
+      let button_div = document.createElement("div");
+      button_div.id = "button" + i.toString();
+      button_div.innerHTML = group.name + " (" + group.count.toString() + ")" + "&#9654;";
+      button_div.id = "button" + i.toString();
+      document.getElementById("poly" + i.toString()).appendChild(button_div);
+      button_div.className = "group";
+
+      let dropdown_div = document.createElement("div");
+      dropdown_div.id = "drop" + i.toString();
+      dropdown_div.className = "group";
+      dropdown_div.style.display = "none";
+      document.getElementById("poly" + i.toString()).appendChild(dropdown_div);
+
+
+      document.getElementById("poly" + `${i}`).addEventListener("click", function() {
+        box_toggle(this.id);
+      });
+
+      // document.getElementById("poly" + i.toString()).appendChild(dropdown_div);
+      for(let j = 0; j < group.count; j++){
+        let box_div = document.createElement("div");
+        box_div.className = "group";
+
+        box_div.innerHTML = group.name;
+        box_div.style = "border: 1px solid black; margin: 5px 20px"
+        document.getElementById("drop" + i.toString()).appendChild(box_div);
+      }
+    }
+    else{
+      div.id = "mono" + i.toString();
+      div.innerHTML = group.name;
+      document.getElementById("display").appendChild(div)
+    }
+  }
+  // document.getElementById("create").disabled = true;
+  function box_toggle (id) {
+    let id_num = id.substr(4);
+    let dropdown_id = "drop" + `${id_num}`
+    let dropdown_div = document.getElementById(`${dropdown_id}`);
+    let button_id = "button" + `${id_num}`
+    let button = document.getElementById(`${button_id}`);
+    let group = groups[parseInt(id_num)];
+    dropped_obj.id_num = !dropped_obj.id_num; 
+    let dropped = dropped_obj.id_num; 
+    // console.log(dropped_obj.id_num);
+    if(dropped === true){
+      dropdown_div.style.display = "block";
+      button.innerHTML =  group.name + " (" + group.count.toString() + ")" + "&#9660;"
+    }
+    else{
+      dropdown_div.style.display = "none";
+      button.innerHTML =  group.name + " (" + group.count.toString() + ")" + "&#9654;"
+    }
+  }
+}
+
+</script>
